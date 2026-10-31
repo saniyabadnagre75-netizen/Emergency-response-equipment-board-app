@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Emergency Response Equipment Selection Guide - Demo</title>
+<style>
+  :root{
+    --bg:#e9ecee; --board:#ffffff; --head:#241a1c; --yellow:#f2d21b;
+    --card:#f6fbfd; --cardline:#a9d3e0; --text:#1d1d1f; --led-off:#e8731f;
+    --led-on:#ffd27a;
+    --c-height:#27a9e1; --c-med:#e8553d; --c-road:#f4d33a; --c-snake:#0f7a55;
+    --c-elec:#2d1b5e; --c-fire:#ee7a4a; --c-oil:#1b2d86;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#17191b; }
+  }
+  *{box-sizing:border-box;margin:0}
+  body{font-family:"Trebuchet MS","Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--text);padding:12px;min-height:100vh}
+  .wrap{max-width:1100px;margin:0 auto}
+  .board{background:var(--board);border-radius:10px;overflow:hidden;box-shadow:0 6px 24px rgba(0,0,0,.25)}
+  .head{background:var(--head);color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+  .head h1{font-size:clamp(15px,3.4vw,30px);font-weight:900;line-height:1.05;letter-spacing:.3px}
+  .head h1 span{color:var(--yellow);display:block}
+  .head small{font-size:11px;opacity:.85;text-align:right;line-height:1.5}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:20px 8px;padding:24px 10px 14px}
+  .item{position:relative;background:var(--card);border:1.5px solid var(--cardline);border-radius:8px;text-align:center;padding:16px 4px 6px;transition:transform .25s, box-shadow .25s, background .25s}
+  .item .ico{font-size:34px;line-height:1.2;filter:grayscale(.15)}
+  .item .nm{font-size:11px;font-weight:800;line-height:1.15;margin-top:4px;min-height:26px;display:flex;align-items:center;justify-content:center}
+  .led{position:absolute;top:-11px;left:50%;transform:translateX(-50%);width:34px;height:20px;border-radius:5px;background:#d94a1e;display:grid;place-items:center}
+  .led i{width:12px;height:12px;border-radius:50%;background:var(--led-off);box-shadow:inset 0 0 0 2px #fff6;transition:all .2s}
+  .item.on{background:#fff8e6;border-color:#ff9a1f;transform:translateY(-3px);box-shadow:0 0 0 2px #ff9a1f55,0 8px 18px #ff7a0033}
+  .item.on .led i{background:var(--led-on);box-shadow:0 0 6px 3px #ffb347,0 0 18px 8px #ff7a1f99;animation:blink .9s infinite alternate}
+  @keyframes blink{from{box-shadow:0 0 6px 3px #ffb347,0 0 14px 6px #ff7a1f88}to{box-shadow:0 0 9px 5px #ffd27a,0 0 26px 12px #ff7a1faa}}
+  .band{background:#d9472b;color:#fff;display:flex;justify-content:space-between;align-items:center;padding:8px 16px;font-weight:900;font-size:clamp(13px,2.6vw,24px);gap:10px}
+  .band small{font-size:11px;font-weight:700;opacity:.9}
+  .scen{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;padding:16px 12px 8px}
+  .sw{border:0;border-radius:10px;color:#fff;padding:14px 8px 12px;font:inherit;font-weight:800;font-size:15px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;min-height:104px;transition:transform .12s, box-shadow .2s, outline-color .2s;outline:3px solid transparent;outline-offset:3px}
+  .sw .e{font-size:34px}
+  .sw:active{transform:scale(.95)}
+  .sw:focus-visible{outline-color:#000}
+  .sw[aria-pressed="true"]{outline-color:#ff9a1f;box-shadow:0 0 18px #ff9a1f99}
+  .sw .tg{width:34px;height:16px;border-radius:9px;background:#0004;position:relative;margin-top:2px}
+  .sw .tg::after{content:"";position:absolute;top:2px;left:3px;width:12px;height:12px;border-radius:50%;background:#fff;transition:left .2s}
+  .sw[aria-pressed="true"] .tg::after{left:19px;background:#ffd27a}
+  .foot{display:flex;flex-wrap:wrap;gap:6px 18px;padding:8px 16px 14px;font-size:11px;font-weight:800;color:#35454d}
+  .panel{margin-top:12px;background:#fff;border-radius:10px;padding:12px 14px;box-shadow:0 2px 10px #0002}
+  .cap{font-size:15px;font-weight:700;min-height:44px}
+  .cap b{color:#c8381a}
+  .ctl{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .ctl button{border:0;border-radius:8px;padding:10px 16px;font:inherit;font-weight:800;cursor:pointer;background:#241a1c;color:#fff;font-size:14px}
+  .ctl button.alt{background:#e3e6e8;color:#241a1c}
+  .ctl button:focus-visible{outline:3px solid #ff9a1f}
+  .prog{height:5px;background:#e3e6e8;border-radius:3px;margin-top:10px;overflow:hidden}
+  .prog div{height:100%;width:0;background:#ff7a1f}
+  .note{font-size:12px;opacity:.75;margin-top:8px;line-height:1.5}
+  @media (prefers-reduced-motion:reduce){.item,.sw,.led i{transition:none;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="board">
+    <div class="head">
+      <h1>EMERGENCY RESPONSE EQUIPMENT<span>SELECTION GUIDE</span></h1>
+      <small>Be prepared<br>Be safe<br>Save lives</small>
+    </div>
+    <div class="grid" id="grid"></div>
+    <div class="band"><span>PRESS BELOW FOR EMERGENCY SCENARIO</span><small>Quick response can save lives</small></div>
+    <div class="scen" id="scen"></div>
+    <div class="foot"><span>RESPOND RIGHT</span><span>USE THE RIGHT EQUIPMENT</span><span>STAY SAFE</span><span>TOGETHER FOR A SAFER WORKPLACE</span></div>
+  </div>
+
+  <div class="panel">
+    <div class="cap" id="cap">Kisi bhi emergency ka button dabao, ya "Auto Demo" chalao.</div>
+    <div class="prog"><div id="bar"></div></div>
+    <div class="ctl">
+      <button id="auto">▶ Auto Demo</button>
+      <button class="alt" id="reset">Reset</button>
+    </div>
+    <p class="note">Asli board ki photos ke hisaab se: Height Rescue, Medical, Road Accident, Snake/Scorpion aur Electrical Shock ki LED mapping photos se li gayi hai. Fire Incident aur Oil Spillage ki photos nahi thi, isliye unki mapping andaze se hai. File ke andar <code>MAP</code> me badal sakte ho.</p>
+  </div>
+</div>
+
+<script>
+const ITEMS = [
+  ["fext","🧯","Fire Extinguishers"],["fblk","🟥","Fire Blankets"],["mask","😷","Mask"],
+  ["aid","🧰","First Aid Kits"],["ambu","🫁","Ambu Bag"],["sguard","🥾","Snake Guard"],
+  ["stick","🪝","Snake Catcher Stick"],["rkit","🎒","Rescue Kit"],["harn","🦺","Safety Harnesses"],
+  ["srl","⛓️","SRL (Self-Retracting Lifeline)"],["g33","🧤","33 KV Electrical Hand Gloves"],
+  ["arc","🥼","ARC Suit"],["earth","🔌","Earthing Rods"],["rhook","🪝","Rescue Hook"],
+  ["oil","🛢️","Oil Spill Kit"],["torch","🔦","Torchies"],["jacket","🦺","Reflective Jackets"],
+  ["whistle","📣","Whistle"],["tape","🚧","Barricading Tape"],["cutg","🧤","Cut Resistant Handgloves"],
+  ["hg","🧤","Handgloves"]
+];
+
+// Scenario -> equipment (first five from the photos, last two assumed)
+const SCEN = [
+  {id:"height",t:"Height Rescue",e:"🧗",c:"--c-height",
+   eq:["aid","rkit","harn","srl","torch","jacket"],
+   say:"Koi unchi jagah se latak gaya / gir gaya. Harness, SRL aur Rescue Kit se bachav, phir First Aid."},
+  {id:"med",t:"Medical Emergency",e:"🚑",c:"--c-med",
+   eq:["mask","aid","ambu","torch","hg"],
+   say:"Medical emergency. First Aid Kit, Ambu Bag (saans dene ke liye), Mask aur Handgloves."},
+  {id:"road",t:"Road Accident",e:"🚗",c:"--c-road",dark:true,
+   eq:["aid","rkit","torch","jacket","whistle","tape"],
+   say:"Road accident. Jagah ko Barricading Tape se gher lo, Jacket pehno, Whistle aur Torch se signal do, First Aid do."},
+  {id:"snake",t:"Snake / Scorpion Bite",e:"🐍",c:"--c-snake",
+   eq:["aid","sguard","stick","torch","cutg"],
+   say:"Saanp/bichhu ka katna. Snake Guard (boot) aur Catcher Stick se surakshit raho, First Aid do."},
+  {id:"elec",t:"Electrical Shock",e:"⚡",c:"--c-elec",
+   eq:["aid","ambu","g33","arc","earth","rhook"],
+   say:"Bijli ka jhatka. 33 KV Gloves, ARC Suit, Earthing Rods aur Rescue Hook se pehle surakshit raho, phir First Aid / Ambu Bag."},
+  {id:"fire",t:"Fire Incident",e:"🔥",c:"--c-fire",
+   eq:["fext","fblk","mask","aid","whistle","tape"],
+   say:"Aag lagi hai (andaza). Fire Extinguisher aur Fire Blanket se control, Mask, First Aid, Whistle aur Barricading Tape."},
+  {id:"oilsp",t:"Oil Spillage",e:"🛢️",c:"--c-oil",
+   eq:["oil","mask","hg","cutg","tape","jacket"],
+   say:"Tel gir gaya (andaza). Oil Spill Kit, Mask, Gloves se safai, Barricading Tape se jagah band."}
+];
+
+const grid=document.getElementById("grid"), scen=document.getElementById("scen");
+const cap=document.getElementById("cap"), bar=document.getElementById("bar");
+const itemEl={}, swEl={}, active=new Set();
+let timer=null, autoOn=false;
+
+ITEMS.forEach(([id,ico,nm])=>{
+  const d=document.createElement("div"); d.className="item";
+  d.innerHTML=`<div class="led"><i></i></div><div class="ico" aria-hidden="true">${ico}</div><div class="nm">${nm}</div>`;
+  grid.appendChild(d); itemEl[id]=d;
+});
+
+SCEN.forEach(s=>{
+  const b=document.createElement("button"); b.className="sw";
+  b.style.background=`var(${s.c})`; if(s.dark) b.style.color="#222";
+  b.setAttribute("aria-pressed","false");
+  b.innerHTML=`<span class="e" aria-hidden="true">${s.e}</span><span>${s.t}</span><span class="tg"></span>`;
+  b.onclick=()=>{ stopAuto(); toggle(s.id); };
+  scen.appendChild(b); swEl[s.id]=b;
+});
+
+function render(){
+  const lit=new Set();
+  SCEN.forEach(s=>{ const on=active.has(s.id); swEl[s.id].setAttribute("aria-pressed",on); if(on) s.eq.forEach(e=>lit.add(e)); });
+  Object.keys(itemEl).forEach(k=>itemEl[k].classList.toggle("on",lit.has(k)));
+  return lit;
+}
+function toggle(id){
+  active.has(id)?active.delete(id):active.add(id);
+  const lit=render(); const s=SCEN.find(x=>x.id===id);
+  if(active.has(id)){
+    const names=s.eq.map(e=>ITEMS.find(i=>i[0]===e)[2]).join(", ");
+    cap.innerHTML=`<b>${s.t}</b> switch ON. ${s.say}<br><small>LED on: ${names}</small>`;
+  } else {
+    cap.innerHTML=`<b>${s.t}</b> switch OFF. Us emergency ki LED band.`;
+  }
+  if(!active.size) cap.innerHTML+=" Board ready hai.";
+}
+function stopAuto(){ autoOn=false; clearTimeout(timer); bar.style.width="0"; document.getElementById("auto").textContent="▶ Auto Demo"; }
+function reset(){ stopAuto(); active.clear(); render(); cap.textContent='Board reset. Kisi bhi emergency ka button dabao.'; }
+
+function runAuto(i=0){
+  if(!autoOn) return;
+  active.clear(); render();
+  const s=SCEN[i%SCEN.length];
+  timer=setTimeout(()=>{
+    if(!autoOn) return;
+    toggle(s.id);
+    const total=4200, t0=performance.now();
+    (function tick(now){
+      if(!autoOn) return;
+      const p=Math.min(1,(now-t0)/total); bar.style.width=(p*100)+"%";
+      if(p<1) requestAnimationFrame(tick);
+    })(t0);
+    timer=setTimeout(()=>runAuto(i+1),total);
+  },700);
+}
+document.getElementById("auto").onclick=()=>{
+  if(autoOn){ stopAuto(); return; }
+  autoOn=true; document.getElementById("auto").textContent="⏸ Stop"; runAuto(0);
+};
+document.getElementById("reset").onclick=reset;
+</script>
+</body>
+</html>
